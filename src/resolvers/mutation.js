@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose")
 const {
     AuthenticationError,
     ForbiddenError
@@ -13,7 +14,7 @@ module.exports = {
         }
         return await models.Note.create({
             content: args.content,
-            author: mongoose.Types.ObjectId(user.id)
+            author: new mongoose.Types.ObjectId(user.id)
         });
     },
     deleteNote: async (parent, { id }, { models, user }) => {
@@ -32,16 +33,13 @@ module.exports = {
         }
     },
     updateNote: async (parent, { content, id }, { models, user }) => {
-        // if not a user, throw an Authentication Error
         if (!user) {
             throw new AuthenticationError('You must be signed in to update a note');
         }
         const note = await models.Note.findById(id);
-        // if the note owner and current user don't match, throw a forbidden error
         if (note && String(note.author) !== user.id) {
             throw new ForbiddenError("You don't have permissions to update the note");
         }
-        // Update the note in the db and return the updated note
         return await models.Note.findOneAndUpdate(
             {
                 _id: id
@@ -100,7 +98,7 @@ module.exports = {
                 id,
                 {
                     $pull: {
-                        favoritedBy: mongoose.Types.ObjectId(user.id)
+                        favoritedBy: new mongoose.Types.ObjectId(user.id)
                     },
                     $inc: {
                         favoriteCount: -1
@@ -116,7 +114,7 @@ module.exports = {
                 id,
                 {
                     $push: {
-                        favoritedBy: mongoose.Types.ObjectId(user.id)
+                        favoritedBy:  new mongoose.Types.ObjectId(user.id)
                     },
                     $inc: {
                         favoriteCount: 1
