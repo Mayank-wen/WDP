@@ -1,15 +1,17 @@
 const { ApolloServer, gql } = require("apollo-server-express");
 const express = require('express');
+require('dotnev').config();
+const db = require('./db')
 const app = express();
 const port = process.env.PORT || 4001;
-
+const DB_HOST = process.env.DB_HOST;
+const models = require('./models')
 let notes = [
   { id: '1', content: 'This is a note', author: 'Mayank Kush' },
   { id: '2', content: 'This is an another note', author: 'Adam Scott' },
   { id: '3', content: 'This is also an another note', author: 'Harlow Everly' },
   { id: '4', content: 'This is at last the last note', author: 'Riley Harrison' }
 ]
-
 const typeDefs = gql`
   type Note {
     id: ID!
@@ -57,5 +59,3 @@ app.listen({ port }, () =>
   console.log(`GraphQL server running at http://localhost:${port}${server.graphqlPath}`)
 );
 
-// app.get('/',(req,res)=> res.send("hello world"))
-//  app.listen(4000,()=> console.log(`listening on port ${port}`))
